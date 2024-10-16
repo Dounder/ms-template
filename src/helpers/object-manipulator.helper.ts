@@ -1,13 +1,9 @@
 export class ObjectManipulator {
   /**
-   * Safely deletes a property from an object if it exists.
-   * Logs a warning if the property does not exist on the object.
-   *
-   * @template T - The type of the object.
-   * @template K - The type of the key, constrained to the keys of the object.
-   * @param {T} obj - The object from which the property should be deleted.
-   * @param {K} key - The key of the property to delete from the object.
-   * @returns {void}
+   * Safely delete a key from an object
+   * @param obj The object to be manipulated
+   * @param key The key to be deleted
+   * @returns void
    */
   static safeDelete<T extends object, K extends keyof T>(obj: T, key: K): void {
     if (!(key in obj)) {
@@ -19,21 +15,19 @@ export class ObjectManipulator {
   }
 
   /**
-   * Excludes specified keys from an object and returns a new object with the remaining properties.
+   * Excludes specific keys from an object and returns a new object without those keys.
    *
    * @template T - The type of the object.
-   * @template K - The type of the keys to be excluded, constrained to the keys of the object.
-   * @param {T} obj - The object from which to exclude properties.
-   * @param {K[]} keys - An array of keys to exclude from the object.
-   * @returns {Partial<T>} A new object with the specified keys excluded.
+   * @param {T} obj - The object to exclude keys from.
+   * @param {(keyof T)[]} keys - An array of keys to be excluded from the object.
+   * @returns {Partial<T>} - A new object with the specified keys excluded.
+   *
+   * @example
+   * const user = { id: '1', username: 'john_doe', password: 'secret' };
+   * const cleanUser = ObjectManipulator.exclude(user, ['password']);
+   * console.log(cleanUser); // Output: { id: '1', username: 'john_doe' }
    */
-  static exclude<T extends object, K extends keyof T>(obj: T, keys: K[]): Partial<T> {
-    return Object.keys(obj).reduce((acc, key) => {
-      if (!keys.includes(key as K)) {
-        acc[key] = obj[key];
-      }
-
-      return acc;
-    }, {} as Partial<T>);
+  static exclude<T extends object>(obj: T, keys: (keyof T)[]): Partial<T> {
+    return Object.fromEntries(Object.entries(obj).filter(([key]) => !keys.includes(key as keyof T))) as Partial<T>;
   }
 }
